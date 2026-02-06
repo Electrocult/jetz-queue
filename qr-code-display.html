@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jetz Queue Registration - QR Code</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 60px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+        }
+        
+        .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 48px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .qr-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+        }
+        
+        #qrcode {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .instructions {
+            margin-top: 40px;
+            text-align: left;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+        }
+        
+        .instructions h2 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .step {
+            display: flex;
+            align-items: start;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .step-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 50px;
+        }
+        
+        .step-text {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .short-link {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #667eea;
+        }
+        
+        .short-link-label {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .short-link-url {
+            font-size: 28px;
+            color: #667eea;
+            font-weight: bold;
+            word-break: break-all;
+        }
+        
+        .social-icons {
+            margin-top: 40px;
+            padding: 30px;
+            background: #667eea;
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .social-icons h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .social-handles {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .setup-form {
+            background: #fff3cd;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .setup-form h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .setup-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .setup-form button {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .setup-form button:hover {
+            background: #5568d3;
+        }
+        
+        .print-button {
+            margin-top: 40px;
+            padding: 20px 50px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .print-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .setup-form,
+            .print-button {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="setup-form" id="setupForm">
+            <h3>⚙️ Setup: Enter Your Registration Form URL</h3>
+            <input 
+                type="text" 
+                id="formUrl" 
+                placeholder="https://forms.gle/..." 
+                value="">
+            <button onclick="generateQR()">Generate QR Code</button>
+            <p style="margin-top: 10px; color: #856404; font-size: 14px;">
+                💡 Get the URL from your Google Form's "Send" button
+            </p>
+        </div>
+        
+        <div class="logo">📸</div>
+        <h1>JETZ PHOTO SERVICE</h1>
+        <p class="subtitle">Scan to Join the Queue</p>
+        
+        <div class="qr-section">
+            <div id="qrcode"></div>
+        </div>
+        
+        <div class="short-link">
+            <div class="short-link-label">Or visit:</div>
+            <div class="short-link-url" id="shortUrl">forms.gle/xxxxx</div>
+        </div>
+        
+        <div class="instructions">
+            <h2>📋 How to Register</h2>
+            
+            <div class="step">
+                <div class="step-number">1️⃣</div>
+                <div class="step-text">
+                    <strong>Follow us on social media:</strong><br>
+                    Instagram: @jetz | TikTok: @jetz
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2️⃣</div>
+                <div class="step-text">
+                    <strong>Scan the QR code</strong> or visit the link above
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3️⃣</div>
+                <div class="step-text">
+                    <strong>Fill in your details:</strong><br>
+                    Name, Email, Phone, Social Media Handle
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4️⃣</div>
+                <div class="step-text">
+                    <strong>Upload screenshot</strong> showing you follow both accounts
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">5️⃣</div>
+                <div class="step-text">
+                    <strong>Get your queue number</strong> instantly!
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">6️⃣</div>
+                <div class="step-text">
+                    <strong>Watch the display</strong> for your turn
+                </div>
+            </div>
+        </div>
+        
+        <div class="social-icons">
+            <h3>📱 Follow Us First!</h3>
+            <div class="social-handles">
+                <div>📸 @jetz</div>
+                <div>🎵 @jetz</div>
+            </div>
+        </div>
+        
+        <button class="print-button" onclick="window.print()">
+            🖨️ Print This Page
+        </button>
+    </div>
+    
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script>
+        let qrCode = null;
+        
+        function generateQR() {
+            const url = document.getElementById('formUrl').value.trim();
+            
+            if (!url) {
+                alert('Please enter your Google Form URL');
+                return;
+            }
+            
+            if (!url.startsWith('http')) {
+                alert('Please enter a valid URL starting with http:// or https://');
+                return;
+            }
+            
+            // Clear existing QR code
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Generate new QR code
+            qrCode = new QRCode(document.getElementById('qrcode'), {
+                text: url,
+                width: 300,
+                height: 300,
+                colorDark: '#667eea',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // Update short link display
+            try {
+                const urlObj = new URL(url);
+                document.getElementById('shortUrl').textContent = urlObj.hostname + urlObj.pathname;
+            } catch (e) {
+                document.getElementById('shortUrl').textContent = url;
+            }
+            
+            // Hide setup form
+            document.getElementById('setupForm').style.display = 'none';
+            
+            // Save to localStorage
+            localStorage.setItem('jetzFormUrl', url);
+        }
+        
+        // Check if URL was saved previously
+        window.onload = function() {
+            const savedUrl = localStorage.getItem('jetzFormUrl');
+            if (savedUrl) {
+                document.getElementById('formUrl').value = savedUrl;
+                generateQR();
+            }
+        };
+        
+        // Show setup form on double-click (for editing)
+        document.querySelector('.container').addEventListener('dblclick', function() {
+            document.getElementById('setupForm').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

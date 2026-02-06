@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control - Queue Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .current-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .label {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .current-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .queue-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .name {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .info-row span:first-child {
+            margin-right: 8px;
+        }
+        
+        .next-button {
+            width: 100%;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .next-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .next-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .upcoming-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .upcoming-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .upcoming-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .upcoming-item .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 50px;
+        }
+        
+        .upcoming-item .details {
+            flex: 1;
+        }
+        
+        .upcoming-item .name {
+            font-size: 16px;
+            color: #333;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        
+        .upcoming-item .phone {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .stats {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat-item {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Admin Control Panel</h1>
+            <p>Tap "NEXT" to call the next person</p>
+        </div>
+        
+        <div id="successMessage" style="display: none;" class="success-message"></div>
+        
+        <div class="current-card">
+            <div class="label">NOW SERVING</div>
+            <div id="currentInfo">
+                <div class="empty-state">Loading...</div>
+            </div>
+            <button id="nextButton" class="next-button" onclick="callNext()">
+                ⏭️ NEXT PERSON
+            </button>
+        </div>
+        
+        <div class="upcoming-card">
+            <div class="label">UPCOMING (Next 5)</div>
+            <div id="upcomingList" class="upcoming-list">
+                <div class="empty-state">Loading...</div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalServed">0</div>
+                <div class="stat-label">Served</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalWaiting">0</div>
+                <div class="stat-label">Waiting</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalRegistered">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration - Replace with your Google Sheets Web App URL
+        const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbyEhQRI-fjck29e4Tm-W1tBsFI7EQpJ4Q-8Pl7kXMOh2t6vDmNFbD_1SwdoSHMtwvMTmg/exec';
+        
+        let isProcessing = false;
+        
+        async function fetchQueue() {
+            try {
+                const response = await fetch(SHEET_API_URL);
+                const data = await response.json();
+                updateDisplay(data);
+            } catch (error) {
+                console.error('Error fetching queue:', error);
+            }
+        }
+        
+        function updateDisplay(data) {
+            // Update current person
+            const currentDiv = document.getElementById('currentInfo');
+            if (data.current) {
+                currentDiv.innerHTML = `
+                    <div class="current-info">
+                        <div class="queue-number">#${data.current.number}</div>
+                        <div class="name">${data.current.name}</div>
+                        <div class="info-row">
+                            <span>📱</span>
+                            <span>${data.current.phone}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>📧</span>
+                            <span>${data.current.email}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>📱</span>
+                            <span>${data.current.social}</span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('nextButton').disabled = false;
+            } else {
+                currentDiv.innerHTML = '<div class="empty-state">No one in queue</div>';
+                document.getElementById('nextButton').disabled = true;
+            }
+            
+            // Update upcoming list
+            const upcomingDiv = document.getElementById('upcomingList');
+            if (data.next && data.next.length > 0) {
+                upcomingDiv.innerHTML = data.next.slice(0, 5).map(person => `
+                    <div class="upcoming-item">
+                        <div class="number">#${person.number}</div>
+                        <div class="details">
+                            <div class="name">${person.name}</div>
+                            <div class="phone">${person.phone}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                upcomingDiv.innerHTML = '<div class="empty-state">No one waiting</div>';
+            }
+            
+            // Update stats
+            document.getElementById('totalServed').textContent = data.stats?.served || 0;
+            document.getElementById('totalWaiting').textContent = data.stats?.waiting || 0;
+            document.getElementById('totalRegistered').textContent = data.stats?.total || 0;
+        }
+        
+        async function callNext() {
+            if (isProcessing) return;
+            
+            isProcessing = true;
+            document.getElementById('nextButton').disabled = true;
+            document.getElementById('nextButton').textContent = '⏳ Processing...';
+            
+            try {
+                const response = await fetch(SHEET_API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'next' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('✓ Next person called!');
+                    await fetchQueue();
+                } else {
+                    alert('Error: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error calling next:', error);
+                alert('Failed to call next person. Please try again.');
+            } finally {
+                isProcessing = false;
+                document.getElementById('nextButton').textContent = '⏭️ NEXT PERSON';
+            }
+        }
+        
+        function showSuccess(message) {
+            const msgDiv = document.getElementById('successMessage');
+            msgDiv.textContent = message;
+            msgDiv.style.display = 'block';
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Initial load
+        fetchQueue();
+        
+        // Auto-refresh every 5 seconds
+        setInterval(fetchQueue, 5000);
+    </script>
+</body>
+</html>

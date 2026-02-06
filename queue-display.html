@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Display - Jetz Photo Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 24px;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            padding: 40px;
+            gap: 30px;
+        }
+        
+        .current-section {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .next-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .queue-number {
+            font-size: 120px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .participant-name {
+            font-size: 48px;
+            color: #333;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        
+        .participant-info {
+            font-size: 20px;
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .next-list {
+            margin-top: 20px;
+        }
+        
+        .next-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .next-item .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .next-item .name {
+            font-size: 18px;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 24px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 JETZ PHOTO SERVICE QUEUE</h1>
+        <p>Follow @jetz on Instagram & TikTok to get your spot!</p>
+    </div>
+    
+    <div class="main-content">
+        <div class="current-section">
+            <div class="section-title">NOW SERVING</div>
+            <div id="currentQueue">
+                <div class="empty-state">Waiting for first participant...</div>
+            </div>
+        </div>
+        
+        <div class="next-section">
+            <div class="section-title">COMING UP NEXT</div>
+            <div id="nextQueue">
+                <div class="empty-state" style="font-size: 16px;">No one in queue yet</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>⏱️ Auto-refresh every 3 seconds | Last updated: <span id="lastUpdate">--:--</span></p>
+    </div>
+    
+    <script>
+        // Configuration - Replace with your Google Sheets Web App URL
+        const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbyEhQRI-fjck29e4Tm-W1tBsFI7EQpJ4Q-8Pl7kXMOh2t6vDmNFbD_1SwdoSHMtwvMTmg/exec';
+        
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = 
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        
+        async function fetchQueue() {
+            try {
+                const response = await fetch(SHEET_API_URL);
+                const data = await response.json();
+                
+                updateDisplay(data);
+                updateTime();
+            } catch (error) {
+                console.error('Error fetching queue:', error);
+            }
+        }
+        
+        function updateDisplay(data) {
+            const currentDiv = document.getElementById('currentQueue');
+            const nextDiv = document.getElementById('nextQueue');
+            
+            if (data.current) {
+                currentDiv.innerHTML = `
+                    <div class="queue-number pulse">#${data.current.number}</div>
+                    <div class="participant-name">${data.current.name}</div>
+                    <div class="participant-info">📱 ${data.current.phone}</div>
+                `;
+            } else {
+                currentDiv.innerHTML = '<div class="empty-state">Waiting for first participant...</div>';
+            }
+            
+            if (data.next && data.next.length > 0) {
+                nextDiv.innerHTML = data.next.map(person => `
+                    <div class="next-item">
+                        <div class="number">#${person.number}</div>
+                        <div class="name">${person.name}</div>
+                    </div>
+                `).join('');
+            } else {
+                nextDiv.innerHTML = '<div class="empty-state" style="font-size: 16px;">No one in queue yet</div>';
+            }
+        }
+        
+        // Initial load
+        fetchQueue();
+        
+        // Auto-refresh every 3 seconds
+        setInterval(fetchQueue, 3000);
+        
+        // Update time every second
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>

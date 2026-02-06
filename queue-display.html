@@ -152,7 +152,7 @@
     
     <div class="main-content">
         <div class="current-section">
-            <div class="section-title">Giliran </div>
+            <div class="section-title">Giliran</div>
             <div id="currentQueue">
                 <div class="empty-state">Menunggu kawan pertama...</div>
             </div>
@@ -173,6 +173,32 @@
     <script>
         // Configuration - Replace with your Google Sheets Web App URL
         const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbyEhQRI-fjck29e4Tm-W1tBsFI7EQpJ4Q-8Pl7kXMOh2t6vDmNFbD_1SwdoSHMtwvMTmg/exec';
+        
+        /**
+         * Mask phone number - show only last 4 digits
+         * Example: 081234567890 → xxxxxxxx7890
+         */
+        function maskPhone(phone) {
+            if (!phone || phone === '-') {
+                return '-';
+            }
+            
+            // Convert to string and remove any spaces or special characters
+            const cleanPhone = String(phone).replace(/\s+/g, '').replace(/[^0-9]/g, '');
+            
+            // If phone number is too short, just mask it all
+            if (cleanPhone.length <= 4) {
+                return 'xxxx';
+            }
+            
+            // Get last 4 digits
+            const lastFour = cleanPhone.slice(-4);
+            
+            // Mask the rest with 'x'
+            const maskedPart = 'x'.repeat(cleanPhone.length - 4);
+            
+            return maskedPart + lastFour;
+        }
         
         function updateTime() {
             const now = new Date();
@@ -197,10 +223,13 @@
             const nextDiv = document.getElementById('nextQueue');
             
             if (data.current) {
+                // Mask phone number for public display
+                const maskedPhone = maskPhone(data.current.phone);
+                
                 currentDiv.innerHTML = `
                     <div class="queue-number pulse">#${data.current.number}</div>
                     <div class="participant-name">${data.current.name}</div>
-                    <div class="participant-info">📱 ${data.current.phone}</div>
+                    <div class="participant-info">📱 ${maskedPhone}</div>
                 `;
             } else {
                 currentDiv.innerHTML = '<div class="empty-state">Menunggu giliran pertama...</div>';
@@ -214,7 +243,7 @@
                     </div>
                 `).join('');
             } else {
-                nextDiv.innerHTML = '<div class="empty-state" style="font-size: 16px;">No one in queue yet</div>';
+                nextDiv.innerHTML = '<div class="empty-state" style="font-size: 16px;">Tidak ada yang mengantri</div>';
             }
         }
         

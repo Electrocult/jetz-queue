@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Control - Queue Management</title>
+    <title>Admin Control - Manajemen Antrian</title>
     <style>
         * {
             margin: 0;
@@ -221,23 +221,23 @@
     <div class="container">
         <div class="header">
             <h1>🎯 Admin Control Panel</h1>
-            <p>Tap "NEXT" to call the next person</p>
+            <p>Tap "NEXT" untuk memanggil partisipan berikutnya</p>
         </div>
         
         <div id="successMessage" style="display: none;" class="success-message"></div>
         
         <div class="current-card">
-            <div class="label">NOW SERVING</div>
+            <div class="label">Sedang Berfotoria</div>
             <div id="currentInfo">
                 <div class="empty-state">Loading...</div>
             </div>
             <button id="nextButton" class="next-button" onclick="callNext()">
-                ⏭️ NEXT PERSON
+                ⏭️ Partisipan berikutnya
             </button>
         </div>
         
         <div class="upcoming-card">
-            <div class="label">UPCOMING (Next 5)</div>
+            <div class="label">Selanjutnya dalam antrian (Next 5)</div>
             <div id="upcomingList" class="upcoming-list">
                 <div class="empty-state">Loading...</div>
             </div>

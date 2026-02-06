@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Queue Display - Jetz Photo Service</title>
+    <title>Antrian Jetz x Si Nopal Nongki di Blok M Photospot</title>
     <style>
         * {
             margin: 0;
@@ -146,28 +146,28 @@
 </head>
 <body>
     <div class="header">
-        <h1>🎯 JETZ PHOTO SERVICE QUEUE</h1>
-        <p>Follow @jetz on Instagram & TikTok to get your spot!</p>
+        <h1>🎯 Antrian JETZ X Si Nopal Nongki di Blok M PHOTOSPOT</h1>
+        <p>Follow @jetz_snack on Instagram & @si_nopal to get your spot!</p>
     </div>
     
     <div class="main-content">
         <div class="current-section">
-            <div class="section-title">NOW SERVING</div>
+            <div class="section-title">Giliran </div>
             <div id="currentQueue">
-                <div class="empty-state">Waiting for first participant...</div>
+                <div class="empty-state">Menunggu kawan pertama...</div>
             </div>
         </div>
         
         <div class="next-section">
-            <div class="section-title">COMING UP NEXT</div>
+            <div class="section-title">Giliran berikutnya</div>
             <div id="nextQueue">
-                <div class="empty-state" style="font-size: 16px;">No one in queue yet</div>
+                <div class="empty-state" style="font-size: 16px;">Tidak ada dalam antrian</div>
             </div>
         </div>
     </div>
     
     <div class="footer">
-        <p>⏱️ Auto-refresh every 3 seconds | Last updated: <span id="lastUpdate">--:--</span></p>
+        <p>⏱️ Auto-refresh setiap 3 detik | update terakhir: <span id="lastUpdate">--:--</span></p>
     </div>
     
     <script>
@@ -203,7 +203,7 @@
                     <div class="participant-info">📱 ${data.current.phone}</div>
                 `;
             } else {
-                currentDiv.innerHTML = '<div class="empty-state">Waiting for first participant...</div>';
+                currentDiv.innerHTML = '<div class="empty-state">Menunggu giliran pertama...</div>';
             }
             
             if (data.next && data.next.length > 0) {
